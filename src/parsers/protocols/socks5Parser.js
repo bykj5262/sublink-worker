@@ -37,7 +37,7 @@ function parseSocks5(link, userAgent = null) {
             tag: tag,                    // 给内部 Builder 使用
             type: 'socks5',
             server: server.trim(),
-            server_port: server_port,    // 给内部 Builder 使用
+            server_port: server_port,    // 给内部 Builder 使用没事
             username: username,
             password: password,
             udp: true,
