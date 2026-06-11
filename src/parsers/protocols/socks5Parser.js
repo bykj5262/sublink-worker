@@ -2,9 +2,9 @@
  * SOCKS5 Parser for sublink-worker
  * 支持格式：socks5://host:port#备注 或 socks5://user:pass@host:port#备注
  */
-
-function parseSocks5(link) {
+function parseSocks5(link, userAgent = null) {
     try {
+        // 忽略 userAgent 参数（SOCKS5 不需要）
         let parts = link.replace(/^socks5:\/\//i, '').split('#');
         let main = parts[0];
         let tag = parts[1] ? decodeURIComponent(parts[1].trim()) : `SOCKS5-${Date.now()}`;
@@ -27,7 +27,9 @@ function parseSocks5(link) {
         const [server, portStr] = hostPort.split(':');
         const server_port = parseInt(portStr, 10);
 
-        if (!server || !server_port) throw new Error('Invalid format');
+        if (!server || !server_port) {
+            throw new Error('Invalid socks5 format');
+        }
 
         return {
             tag: tag,
