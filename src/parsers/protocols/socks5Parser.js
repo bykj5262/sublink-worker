@@ -1,25 +1,27 @@
 /**
  * SOCKS5 Parser for sublink-worker
- * 支持格式：socks5://host:port#备注 或 socks5://user:pass@host:port#备注
+ * 适配 Clash Verge 格式
  */
 function parseSocks5(link, userAgent = null) {
     try {
         let parts = link.replace(/^socks5:\/\//i, '').split('#');
         let main = parts[0].trim();
-        let remark = parts[1] ? decodeURIComponent(parts[1].trim()) : `SOCKS5-${Date.now()}`;
+        let name = parts[1] ? decodeURIComponent(parts[1].trim()) : 'SOCKS5节点';
 
         let username = undefined;
         let password = undefined;
         let hostPort = main;
 
-        // 处理带用户名密码
+        // 处理用户名:密码@服务器:端口
         if (main.includes('@')) {
             const [auth, hp] = main.split('@');
-            hostPort = hp;
+            hostPort = hp.trim();
             if (auth.includes(':')) {
-                [username, password] = auth.split(':');
+                const [user, pass] = auth.split(':');
+                username = user.trim();
+                password = pass ? pass.trim() : '';
             } else {
-                username = auth;
+                username = auth.trim();
             }
         }
 
@@ -31,13 +33,13 @@ function parseSocks5(link, userAgent = null) {
         }
 
         return {
-            name: remark,                    // ← 必须是 name
+            name: name,           // Clash 需要 name
             type: 'socks5',
             server: server.trim(),
-            port: port,                      // ← 必须是 port（不是 server_port）
-            username: username ? username.trim() : undefined,
-            password: password ? password.trim() : undefined,
-            udp: true,                       // 可选，建议加上
+            port: port,           // 关键：使用 port 而不是 server_port
+            username: username,
+            password: password,
+            udp: true,
         };
     } catch (e) {
         console.error('[SOCKS5 Parser] Error:', e.message);
