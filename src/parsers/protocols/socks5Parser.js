@@ -1,5 +1,6 @@
 /**
- * SOCKS5 Parser - 适配 sublink-worker 内部格式
+ * SOCKS5 Parser for sublink-worker
+ * 严格适配项目内部格式 + Clash Builder
  */
 function parseSocks5(link, userAgent = null) {
     try {
@@ -28,15 +29,16 @@ function parseSocks5(link, userAgent = null) {
         const server_port = parseInt(portStr, 10);
 
         if (!server || !server_port || isNaN(server_port)) {
-            console.error('[SOCKS5] Invalid format:', main);
+            console.error('[SOCKS5] Invalid format');
             return null;
         }
 
+        // 关键：使用项目主流 Parser 风格
         return {
-            tag: tag,                    // 项目内部统一用 tag
+            tag: tag,
             type: 'socks5',
             server: server.trim(),
-            server_port: server_port,    // 关键：使用 server_port
+            server_port: server_port,
             username: username,
             password: password,
             udp: true
