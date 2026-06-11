@@ -22,7 +22,6 @@
   "dependencies": {
     "esbuild-register": "^3.6.0",
     "hono": "^4.10.7",
-    "qrcode": "^1.5.4" 
     "ioredis": "^5.8.2",
     "js-yaml": "^4.1.1"
   },
