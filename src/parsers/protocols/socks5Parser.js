@@ -1,11 +1,12 @@
+/**
+ * SOCKS5 Parser - 适配 sublink-worker 内部格式
+ */
 function parseSocks5(link, userAgent = null) {
     try {
-        console.log('[SOCKS5 Parser] Input:', link);  // 调试日志
-
         let cleanLink = decodeURIComponent(link.trim());
         let parts = cleanLink.replace(/^socks5:\/\//i, '').split('#');
         let main = parts[0].trim();
-        let name = parts[1] ? parts[1].trim() : 'SOCKS5节点';
+        let tag = parts[1] ? parts[1].trim() : 'SOCKS5节点';
 
         let username = undefined;
         let password = undefined;
@@ -24,27 +25,24 @@ function parseSocks5(link, userAgent = null) {
         }
 
         const [server, portStr] = hostPort.split(':');
-        const port = parseInt(portStr, 10);
+        const server_port = parseInt(portStr, 10);
 
-        if (!server || !port || isNaN(port)) {
+        if (!server || !server_port || isNaN(server_port)) {
             console.error('[SOCKS5] Invalid format:', main);
             return null;
         }
 
-        const result = {
-            name: name,
+        return {
+            tag: tag,                    // 项目内部统一用 tag
             type: 'socks5',
             server: server.trim(),
-            port: port,
+            server_port: server_port,    // 关键：使用 server_port
             username: username,
             password: password,
             udp: true
         };
-
-        console.log('[SOCKS5 Parser] Success Output:', result);  // 调试日志
-        return result;
     } catch (e) {
-        console.error('[SOCKS5 Parser] Error:', e.message, link);
+        console.error('[SOCKS5 Parser] Error:', e.message);
         return null;
     }
 }
