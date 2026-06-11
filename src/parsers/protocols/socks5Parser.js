@@ -4,16 +4,15 @@
  */
 function parseSocks5(link, userAgent = null) {
     try {
-        // 忽略 userAgent 参数（SOCKS5 不需要）
         let parts = link.replace(/^socks5:\/\//i, '').split('#');
-        let main = parts[0];
-        let tag = parts[1] ? decodeURIComponent(parts[1].trim()) : `SOCKS5-${Date.now()}`;
+        let main = parts[0].trim();
+        let remark = parts[1] ? decodeURIComponent(parts[1].trim()) : `SOCKS5-${Date.now()}`;
 
-        let username = null;
-        let password = null;
+        let username = undefined;
+        let password = undefined;
         let hostPort = main;
 
-        // 处理带认证信息
+        // 处理带用户名密码
         if (main.includes('@')) {
             const [auth, hp] = main.split('@');
             hostPort = hp;
@@ -25,19 +24,20 @@ function parseSocks5(link, userAgent = null) {
         }
 
         const [server, portStr] = hostPort.split(':');
-        const server_port = parseInt(portStr, 10);
+        const port = parseInt(portStr, 10);
 
-        if (!server || !server_port) {
+        if (!server || !port || isNaN(port)) {
             throw new Error('Invalid socks5 format');
         }
 
         return {
-            tag: tag,
+            name: remark,                    // ← 必须是 name
             type: 'socks5',
             server: server.trim(),
-            server_port: server_port,
+            port: port,                      // ← 必须是 port（不是 server_port）
             username: username ? username.trim() : undefined,
             password: password ? password.trim() : undefined,
+            udp: true,                       // 可选，建议加上
         };
     } catch (e) {
         console.error('[SOCKS5 Parser] Error:', e.message);
