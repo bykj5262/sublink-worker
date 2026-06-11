@@ -1,12 +1,13 @@
 /**
- * SOCKS5 Parser - 适配 Clash Verge 要求
+ * SOCKS5 Parser for sublink-worker
+ * 同时兼容内部处理 + ClashConfigBuilder
  */
 function parseSocks5(link, userAgent = null) {
     try {
         let cleanLink = decodeURIComponent(link.trim());
         let parts = cleanLink.replace(/^socks5:\/\//i, '').split('#');
         let main = parts[0].trim();
-        let name = parts[1] ? parts[1].trim() : 'SOCKS5节点';
+        let tag = parts[1] ? parts[1].trim() : 'SOCKS5节点';
 
         let username = undefined;
         let password = undefined;
@@ -25,22 +26,24 @@ function parseSocks5(link, userAgent = null) {
         }
 
         const [server, portStr] = hostPort.split(':');
-        const port = parseInt(portStr, 10);
+        const server_port = parseInt(portStr, 10);
 
-        if (!server || !port || isNaN(port)) {
+        if (!server || !server_port || isNaN(server_port)) {
             console.error('[SOCKS5] Invalid format');
             return null;
         }
 
-        // 直接返回 Clash 需要的字段
         return {
-            name: name,           // 关键修改
+            tag: tag,                    // 给内部 Builder 使用
             type: 'socks5',
             server: server.trim(),
-            port: port,           // 关键修改：用 port 而不是 server_port
+            server_port: server_port,    // 给内部 Builder 使用
             username: username,
             password: password,
-            udp: true
+            udp: true,
+            // 额外添加 Clash 直接需要的字段（双保险）
+            name: tag,
+            port: server_port
         };
     } catch (e) {
         console.error('[SOCKS5 Parser] Error:', e.message);
