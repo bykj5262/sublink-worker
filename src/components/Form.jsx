@@ -5,7 +5,6 @@ import { CustomRules } from './CustomRules.jsx';
 import { TextareaWithActions } from './TextareaWithActions.jsx';
 import { ValidatedTextarea } from './ValidatedTextarea.jsx';
 import { formLogicFn } from './formLogic.js';
-import QRCodeSVG from 'qrcode-svg';   // ← 新增这一行
 
 const LINK_FIELDS = [
   { key: 'xray', labelKey: 'xrayLink' },
@@ -51,7 +50,6 @@ export const Form = (props) => {
         {/* 以下所有内容和原来完全一致，直到 Results Section */}
         {/* Input Section、Advanced Options 等全部保持不变 */}
 
-        {/* Results Section - 只在这里增加了二维码 */}
         <div x-cloak x-show="generatedLinks" x-data="{ copied: null }" {...{'x-transition:enter': 'transition ease-out duration-500', 'x-transition:enter-start': 'opacity-0 transform translate-y-8', 'x-transition:enter-end': 'opacity-100 transform translate-y-0'}} class="mt-12">
           <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8 transition-all duration-300 hover:shadow-md">
             
@@ -96,43 +94,6 @@ export const Form = (props) => {
                 </div>
               ))}
             </div>
-
-            {/* ==================== 新增二维码部分 ==================== */}
-            <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
-                <i class="fas fa-qrcode text-xl"></i>
-                扫码订阅（推荐）
-              </h3>
-              <div class="flex flex-wrap gap-8 justify-center">
-                {LINK_FIELDS.map((field) => {
-                  const link = (shortenedLinks || generatedLinks)?.[field.key];
-                  if (!link) return null;
-                  return (
-                    <div key={field.key} class="text-center">
-                      <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                        {t(field.labelKey)}
-                      </div>
-                      <div class="bg-white p-3 rounded-2xl shadow inline-block">
-                        <div dangerouslySetInnerHTML={{
-                          __html: new QRCodeSVG({
-                            content: link,
-                            width: 200,
-                            height: 200,
-                            padding: 4,
-                            color: { dark: "#000000", light: "#ffffff" }
-                          }).svg()
-                        }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-                使用 Clash Verge、Stash、NekoBox 等客户端扫码导入订阅
-              </p>
-            </div>
-            {/* ==================== 二维码部分结束 ==================== */}
-
             {/* Shortening Controls 原有内容保持不变 */}
             <div class="mt-6">
               {/* ... 原有的 Shortening Controls 代码 ... */}
