@@ -5,6 +5,7 @@ import { CustomRules } from './CustomRules.jsx';
 import { TextareaWithActions } from './TextareaWithActions.jsx';
 import { ValidatedTextarea } from './ValidatedTextarea.jsx';
 import { formLogicFn } from './formLogic.js';
+import QRCodeSVG from 'qrcode-svg';
 
 const LINK_FIELDS = [
   { key: 'xray', labelKey: 'xrayLink' },
@@ -384,6 +385,45 @@ class="px-6 py-3.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 bo
           </div>
         ))}
       </div>
+
+      </div>
+
+      {/* Shortening Controls */}
+      <div class="mt-6">
+            {/* ==================== 二维码区域 ==================== */}
+            <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                <i class="fas fa-qrcode"></i>
+                扫码订阅
+              </h3>
+              <div class="flex flex-wrap gap-6 justify-center">
+                {LINK_FIELDS.map((field) => {
+                  const link = (shortenedLinks || generatedLinks)?.[field.key];
+                  if (!link) return null;
+                  return (
+                    <div key={field.key} class="text-center">
+                      <div class="text-sm mb-2 text-gray-600 dark:text-gray-400">
+                        {t(field.labelKey)}
+                      </div>
+                      <div class="bg-white p-4 rounded-2xl shadow inline-block">
+                        <div dangerouslySetInnerHTML={{
+                          __html: new QRCodeSVG({
+                            content: link,
+                            width: 200,
+                            height: 200,
+                            padding: 4
+                          }).svg()
+                        }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+                使用 Clash Verge、Stash、NekoBox 等客户端扫码导入
+              </p>
+            </div>
+            {/* ==================== 二维码结束 ==================== */}
 
       {/* Shortening Controls */}
       <div class="mt-6">
