@@ -5,6 +5,7 @@ import { CustomRules } from './CustomRules.jsx';
 import { TextareaWithActions } from './TextareaWithActions.jsx';
 import { ValidatedTextarea } from './ValidatedTextarea.jsx';
 import { formLogicFn } from './formLogic.js';
+import QRCodeSVG from 'qrcode-svg';   // ← 新增导入
 
 const LINK_FIELDS = [
   { key: 'xray', labelKey: 'xrayLink' },
@@ -47,14 +48,15 @@ export const Form = (props) => {
   return (
     <div x-data="formData()" x-init="init()" class="max-w-4xl mx-auto">
       <form {...{'x-on:submit.prevent': 'submitForm'}} class="space-y-8">
-        {/* 以下所有内容和原来完全一致，直到 Results Section */}
-        {/* Input Section、Advanced Options 等全部保持不变 */}
+        
+        {/* 这里是原来的所有 Input、Advanced Options 等内容，请保持不变 */}
+        {/* ... (从 <div class="bg-white dark:bg-gray-800 rounded-2xl ... 开始到 Action Buttons) ... */}
 
-        {/* Results Section - 只在这里增加了二维码 */}
+        {/* Results Section - 只修改这里 */}
         <div x-cloak x-show="generatedLinks" x-data="{ copied: null }" {...{'x-transition:enter': 'transition ease-out duration-500', 'x-transition:enter-start': 'opacity-0 transform translate-y-8', 'x-transition:enter-end': 'opacity-100 transform translate-y-0'}} class="mt-12">
           <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8 transition-all duration-300 hover:shadow-md">
             
-            {/* 原有订阅链接部分（完全不变） */}
+            {/* 原有订阅链接部分 */}
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
@@ -96,14 +98,49 @@ export const Form = (props) => {
               ))}
             </div>
 
-            {/* Shortening Controls 原有内容保持不变 */}
-            <div class="mt-6">
-              {/* ... 原有的 Shortening Controls 代码 ... */}
+            {/* ==================== 二维码区域（新增） ==================== */}
+            <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                <i class="fas fa-qrcode"></i>
+                扫码订阅
+              </h3>
+              <div class="flex flex-wrap gap-6 justify-center">
+                {LINK_FIELDS.map((field) => {
+                  const link = (shortenedLinks || generatedLinks)?.[field.key];
+                  if (!link) return null;
+                  return (
+                    <div key={field.key} class="text-center">
+                      <div class="text-sm mb-2 text-gray-600 dark:text-gray-400">
+                        {t(field.labelKey)}
+                      </div>
+                      <div class="bg-white p-4 rounded-2xl shadow inline-block">
+                        <div dangerouslySetInnerHTML={{
+                          __html: new QRCodeSVG({
+                            content: link,
+                            width: 200,
+                            height: 200,
+                            padding: 4
+                          }).svg()
+                        }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+                使用 Clash Verge / Stash / NekoBox 等扫码导入
+              </p>
             </div>
+            {/* ==================== 二维码结束 ==================== */}
+
+            {/* Shortening Controls - 原有内容 */}
+            <div class="mt-6">
+              {/* 这里保持你原来的 Shortening Controls 代码 */}
+            </div>
+
           </div>
         </div>
       </form>
-
       <script dangerouslySetInnerHTML={{ __html: scriptContent }} />
     </div>
   );
